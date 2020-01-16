@@ -21,7 +21,7 @@ cd "${SCRIPT_DIR}"
 # Number of CPU cores/parallel compilation instances (for Darwin/Linux builds)
 NUM_CORES=8
 
-MSVC_GENERATOR="Visual Studio 14 2015"
+MSVC_GENERATOR="Visual Studio 16 2019"
 
 declare -a EMBREE_CONFIG
 EMBREE_CONFIG+=(-DEMBREE_ISPC_SUPPORT=OFF)
@@ -56,12 +56,13 @@ hg_clone_if_not_exist () {
 
 compile_embree_ogg_vorbis () {
   MAKE_GENERATOR=$1
-  BUILD_PATH=$2
-  INSTALL_PATH=$3
+  MAKE_ARCH=$2
+  BUILD_PATH=$3
+  INSTALL_PATH=$4
 
   CONFIG_WITH_GENERATOR=( "${CONFIG_FLAGS[@]}" )
   if [[ ! -z "${MAKE_GENERATOR}" ]]; then
-    CONFIG_WITH_GENERATOR+=(-G"${MAKE_GENERATOR}")
+    CONFIG_WITH_GENERATOR+=(-G"${MAKE_GENERATOR}" "${MAKE_ARCH}")
   fi
   CONFIG_WITH_GENERATOR+=(-DCMAKE_INSTALL_PREFIX="${SCRIPT_DIR}/${INSTALL_PATH}/")
 
@@ -106,26 +107,26 @@ case "$(uname -s)" in
     CONFIG_FLAGS+=(-DCMAKE_OSX_ARCHITECTURES=x86_64)
     BUILD_FLAGS+=(-j "${NUM_CORES}")
     DEFAULT_GENERATOR_FLAG=""
-    compile_embree_ogg_vorbis "${DEFAULT_GENERATOR_FLAG}" "build" "install"
+    compile_embree_ogg_vorbis "${DEFAULT_GENERATOR_FLAG}" "" "build" "install"
     ;;
 
   Linux)
     BUILD_FLAGS+=(-j "${NUM_CORES}")
     DEFAULT_GENERATOR_FLAG=""
-    compile_embree_ogg_vorbis "${DEFAULT_GENERATOR_FLAG}" "build" "install"
+    compile_embree_ogg_vorbis "${DEFAULT_GENERATOR_FLAG}" "" "build" "install"
     ;;
 
   CYGWIN*|MINGW*|MSYS*)
     CONFIG_FLAGS+=(-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON)
-    EMBREE_CONFIG+=(-DEMBREE_STATIC_RUNTIME=ON)
+    EMBREE_CONFIG+=(-DEMBREE_STATIC_RUNTIME=OFF)
 
     # Create 64bit builds
-    WIN64_GENERATOR_FLAG="${MSVC_GENERATOR} Win64"
-    compile_embree_ogg_vorbis "${WIN64_GENERATOR_FLAG}" "build64" "install64"
+    WIN64_GENERATOR_FLAG="${MSVC_GENERATOR}"
+    compile_embree_ogg_vorbis "${WIN64_GENERATOR_FLAG}" "-Ax64" "build64" "install64"
 
     # Create 32bit builds
     WIN32_GENERATOR_FLAG="${MSVC_GENERATOR}"
-    compile_embree_ogg_vorbis "${WIN32_GENERATOR_FLAG}" "build32" "install32"
+    compile_embree_ogg_vorbis "${WIN32_GENERATOR_FLAG}" "" "build32" "install32"
     ;;
 
   *)

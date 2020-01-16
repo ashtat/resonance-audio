@@ -1,0 +1,7 @@
+LIBRARY "audiopluginresonanceaudio"
+
+EXPORTS
+  SetListenerGain
+  SetListenerStereoSpeakerMode
+  SetRoomProperties
+  UnityGetAudioEffectDefinitions

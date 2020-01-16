@@ -29,7 +29,7 @@ ANDROID_NDK="~/android-ndk-r15c/"
 ANDROID_NATIVE_API_LEVEL="21"
 ANDROID_ABI="armeabi-v7a with NEON"
 
-MSVC_GENERATOR="Visual Studio 14 2015 Win64"
+MSVC_GENERATOR="Visual Studio 16 2019"
 
 function show_help()
 {
@@ -55,12 +55,13 @@ Please select a build target:
   --ios_os_toolchain         # Use iOS ARM toolchain.
   --ios_simulator_toolchain  # Use iOS X86 simulator toolchain.
   --msvc_dynamic_runtime     # Enables dynamic runtime environment linking in MSVC builds.
+  --windowsstore             # Build for WindowsStore
 EOF
 exit
 }
 
 BUILD_TARGET=""
-
+WIN_ARCH=x64
 for i in "$@"
 do
   case $i in
@@ -104,6 +105,12 @@ do
       shift # past argument with no value
       ;;
 
+    --windowsstore=*)
+      WIN_ARCH="${i#*=}"
+      CONFIG_FLAGS+=(-DCMAKE_SYSTEM_NAME=WindowsStore)
+      CONFIG_FLAGS+=(-DCMAKE_SYSTEM_VERSION=10.0)
+      shift # past argument with no value
+      ;;
     *)
       # unknown option
       echo "Unknown option: ${i}"
@@ -135,6 +142,7 @@ case "$(uname -s)" in
 
   CYGWIN*|MINGW*|MSYS*)
     cmake -G"${MSVC_GENERATOR}"\
+      -A"${WIN_ARCH}"\
       -DBUILD_"${BUILD_TARGET}":BOOL=ON\
       "${CONFIG_FLAGS[@]}" "$@" ..
     ;;

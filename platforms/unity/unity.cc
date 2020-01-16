@@ -26,7 +26,7 @@ limitations under the License.
 #include "graph/resonance_audio_api_impl.h"
 #include "platforms/common/room_effects_utils.h"
 
-#if !(defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS))
+#if !(defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_WINDOWSSTORE))
 #include "utils/ogg_vorbis_recorder.h"
 #endif  // !(defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS))
 
@@ -38,7 +38,7 @@ namespace {
 // Output channels must be stereo for the ResonanceAudio system to run properly.
 const size_t kNumOutputChannels = 2;
 
-#if !(defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS))
+#if !(defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_WINDOWSSTORE))
 // Maximum number of buffers allowed to record a soundfield, which is set to ~5
 // minutes (depending on the sampling rate and the number of frames per buffer).
 const size_t kMaxNumRecordBuffers = 15000;
@@ -55,7 +55,7 @@ struct ResonanceAudioSystem {
                        size_t frames_per_buffer)
       : api(CreateResonanceAudioApi(num_channels, frames_per_buffer,
                                     sample_rate)) {
-#if !(defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS))
+#if !(defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_WINDOWSSTORE))
     is_recording_soundfield = false;
     soundfield_recorder.reset(
         new OggVorbisRecorder(sample_rate, kNumFirstOrderAmbisonicChannels,
@@ -70,7 +70,7 @@ struct ResonanceAudioSystem {
   ReflectionProperties null_reflection_properties;
   ReverbProperties null_reverb_properties;
 
-#if !(defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS))
+#if !(defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_WINDOWSSTORE))
   // Denotes whether the soundfield recording is currently in progress.
   bool is_recording_soundfield;
 
@@ -114,7 +114,7 @@ void ProcessListener(size_t num_frames, float* output) {
     std::fill(output, output + buffer_size_samples, 0.0f);
   }
 
-#if !(defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS))
+#if !(defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_WINDOWSSTORE))
   if (resonance_audio_copy->is_recording_soundfield) {
     // Record output into soundfield.
     auto* const resonance_audio_api_impl =
@@ -296,7 +296,7 @@ void SetRoomProperties(RoomProperties* room_properties, float* rt60s) {
   resonance_audio_copy->api->SetReverbProperties(reverb_properties);
 }
 
-#if !(defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS))
+#if !(defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS) || defined(PLATFORM_WINDOWSSTORE))
 bool StartSoundfieldRecorder() {
   auto resonance_audio_copy = resonance_audio;
   if (resonance_audio_copy == nullptr) {
