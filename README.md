@@ -35,7 +35,7 @@ SDKs:
 -   [Mercurial](https://www.mercurial-scm.org/downloads)
 
 _Note: For Windows builds, [Visual Studio
-2015](https://www.visualstudio.com/vs/older-downloads/) is recommended._
+2019](https://visualstudio.microsoft.com/downloads/) is recommended._
 
 ### Third Party Dependencies
 
@@ -140,6 +140,11 @@ The script provides the following flags:
 -   --ios_simulator_toolchain
     -   Enables the iOS Simulator toolchain. For more information, see project
         documentation at https://github.com/leetal/ios-cmake
+-   --windowsstore=
+    -   `x86`: Builds UWP x86
+    -   `x64`: Builds UWP x64
+    -   `ARM`: Builds UWP ARM
+    -   `ARM64`: Builds UWP ARM64
 
 ##### E.g.
 
